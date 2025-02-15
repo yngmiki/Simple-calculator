@@ -1,75 +1,229 @@
-<header>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+    }
 
-<!--
-  <<< Author notes: Course header >>>
-  Include a 1280×640 image, course title in sentence case, and a concise description in emphasis.
-  In your repository settings: enable template repository, add your 1280×640 social image, auto delete head branches.
-  Add your open source license, GitHub uses MIT license.
--->
+    .calculator {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 300px;
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-# Introduction to GitHub
+    .calculator-screen {
+      width: 100%;
+      height: 60px;
+      border: none;
+      background-color: #eee;
+      text-align: right;
+      padding-right: 10px;
+      padding-left: 10px;
+      font-size: 2rem;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      box-sizing: border-box; /* Important for padding to not affect width */
+    }
 
-_Get started using GitHub in less than an hour._
+    .calculator-keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+    }
 
-</header>
+    button {
+      height: 50px;
+      background-color: #f2f2f2;
+      border: 1px solid #ccc;
+      font-size: 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
 
-<!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
--->
+    button:hover {
+      background-color: #e0e0e0;
+    }
 
-## Step 1: Create a branch
+    .operator {
+      background-color: #ddd;
+    }
 
-_Welcome to "Introduction to GitHub"! :wave:_
+    .operator:hover {
+      background-color: #ccc;
+    }
 
-**What is GitHub?**: GitHub is a collaboration platform that uses _[Git](https://docs.github.com/get-started/quickstart/github-glossary#git)_ for versioning. GitHub is a popular place to share and contribute to [open-source](https://docs.github.com/get-started/quickstart/github-glossary#open-source) software.
-<br>:tv: [Video: What is GitHub?](https://www.youtube.com/watch?v=pBy1zgt0XPc)
+    .equal-sign {
+      grid-column: 3 / 5; /* Spans two columns */
+      background-color: #4CAF50; /* Green */
+      color: white;
+    }
 
-**What is a repository?**: A _[repository](https://docs.github.com/get-started/quickstart/github-glossary#repository)_ is a project containing files and folders. A repository tracks versions of files and folders. For more information, see "[About repositories](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories)" from GitHub Docs.
+    .equal-sign:hover {
+      background-color: #3e8e41;
+    }
 
-**What is a branch?**: A _[branch](https://docs.github.com/en/get-started/quickstart/github-glossary#branch)_ is a parallel version of your repository. By default, your repository has one branch named `main` and it is considered to be the definitive branch. Creating additional branches allows you to copy the `main` branch of your repository and safely make any changes without disrupting the main project. Many people use branches to work on specific features without affecting any other parts of the project.
+    .all-clear {
+      background-color: #f44336; /* Red */
+      color: white;
+    }
 
-Branches allow you to separate your work from the `main` branch. In other words, everyone's work is safe while you contribute. For more information, see "[About branches](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-branches)".
+    .all-clear:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
 
-**What is a profile README?**: A _[profile README](https://docs.github.com/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)_ is essentially an "About me" section on your GitHub profile where you can share information about yourself with the community on GitHub.com. GitHub shows your profile README at the top of your profile page. For more information, see "[Managing your profile README](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme)".
+  <div class="calculator">
+    <input type="text" class="calculator-screen" value="0" disabled />
+    <div class="calculator-keys">
+      <button class="operator" value="+">+</button>
+      <button class="operator" value="-">-</button>
+      <button class="operator" value="*">&times;</button>
+      <button class="operator" value="/">&divide;</button>
 
-![profile-readme-example](/images/profile-readme-example.png)
+      <button value="7">7</button>
+      <button value="8">8</button>
+      <button value="9">9</button>
+      <button class="all-clear">AC</button>
 
-### :keyboard: Activity: Your first branch
+      <button value="4">4</button>
+      <button value="5">5</button>
+      <button value="6">6</button>
 
-1. Open a new browser tab and navigate to your newly made repository. Then, work on the steps in your second tab while you read the instructions in this tab.
-2. Navigate to the **< > Code** tab in the header menu of your repository.
+      <button value="1">1</button>
+      <button value="2">2</button>
+      <button value="3">3</button>
 
-   ![code-tab](/images/code-tab.png)
+      <button value="0">0</button>
+            <button class="decimal" value=".">.</button>
+      <button class="equal-sign" value="=">=</button>
+    </div>
+  </div>
 
-3. Click on the **main** branch drop-down.
+  <script>
+    const calculatorScreen = document.querySelector('.calculator-screen');
+    const keys = document.querySelector('.calculator-keys');
 
-   ![main-branch-dropdown](/images/main-branch-dropdown.png)
+    let displayValue = '0';
+    let firstValue = null;
+    let operator = null;
+    let waitingForSecondValue = false;
 
-4. In the field, name your branch `my-first-branch`. In this case, the name must be `my-first-branch` to trigger the course workflow.
-5. Click **Create branch: my-first-branch** to create your branch.
+    updateDisplay(); // Initialize the display
 
-   ![create-branch-button](/images/create-branch-button.png)
+    function updateDisplay() {
+      calculatorScreen.value = displayValue;
+    }
 
-   The branch will automatically switch to the one you have just created.
-   The **main** branch drop-down bar will reflect your new branch and display the new branch name.
+    keys.addEventListener('click', function(e) {
+      const element = e.target;
 
-6. Wait about 20 seconds then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
+      if (!element.matches('button')) return;
 
-<footer>
+      if (element.classList.contains('operator')) {
+        handleOperator(element.value);
+        updateDisplay();
+        return;
+      }
 
-<!--
-  <<< Author notes: Footer >>>
-  Add a link to get support, GitHub status page, code of conduct, license link.
--->
+      if (element.classList.contains('all-clear')) {
+        clear();
+        updateDisplay();
+        return;
+      }
 
----
+      if (element.classList.contains('equal-sign')) {
+        calculate();
+        updateDisplay();
+        return;
+      }
 
-Get help: [Post in our discussion board](https://github.com/orgs/skills/discussions/categories/introduction-to-github) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
+      if (element.classList.contains('decimal')) {
+        inputDecimal(element.value);
+        updateDisplay();
+        return;
+      }
 
-&copy; 2024 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+      inputNumber(element.value);
+      updateDisplay();
+    });
 
-</footer>
+    function inputNumber(num) {
+      if (waitingForSecondValue === true) {
+        displayValue = num;
+        waitingForSecondValue = false;
+      } else {
+        displayValue = displayValue === '0' ? num : displayValue + num;
+      }
+    }
+
+    function inputDecimal(dot) {
+      if (!displayValue.includes(dot)) {
+        displayValue += dot;
+      }
+    }
+
+    function handleOperator(nextOperator) {
+      const value = parseFloat(displayValue);
+
+      if (firstValue === null) {
+        firstValue = value;
+      } else if (operator) {
+        const result = operate(firstValue, value, operator);
+
+        displayValue = String(result);
+        firstValue = result;
+      }
+
+      waitingForSecondValue = true;
+      operator = nextOperator;
+    }
+
+    function calculate() {
+      const secondValue = parseFloat(displayValue)
+
+      if(operator) {
+        const result = operate(firstValue, secondValue, operator);
+        displayValue = String(result);
+        firstValue = result;
+        operator = null;
+        waitingForSecondValue = false;
+      }
+    }
+
+    function operate(num1, num2, oper) {
+      if (oper === '+') {
+        return num1 + num2;
+      } else if (oper === '-') {
+        return num1 - num2;
+      } else if (oper === '*') {
+        return num1 * num2;
+      } else if (oper === '/') {
+        return num1 / num2;
+      }
+
+      return num2; // Default return if operator is not recognized.
+    }
+
+    function clear() {
+      displayValue = '0';
+      firstValue = null;
+      operator = null;
+      waitingForSecondValue = false;
+    }
+  </script>
+
+</body>
+</html>
